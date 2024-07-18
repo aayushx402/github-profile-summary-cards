@@ -1,49 +1,29 @@
-name: Test and Lint
+name: GitHub-Profile-Summary-Cards
 
 on:
-  push:
-    branches-ignore: [ release ]
-  pull_request:
-    branches: [ main ]
+  schedule: # execute every 24 hours
+    - cron: "* */24 * * *"
+  workflow_dispatch:
 
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
+    name: generate-github-profile-summary-cards
+    permissions:
+      contents: write
+
     steps:
-    - name: Collect Workflow Telemetry
-      uses: catchpoint/foresight-workflow-kit-action@v1
-      if: success() || failure()
-      with:
-        api_key: ${{ secrets.foresight_api_key }}
-
-    - uses: actions/checkout@v4
-    - name: Use Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: '.node-version'
-        cache: 'npm'
-    - run: npm install
-    - run: npm run test
-
-    - name: Analyze Test and/or Coverage Results
-      uses: catchpoint/foresight-test-kit-action@v1
-      if: success() || failure()
-      with:
-        api_key: ${{ secrets.foresight_api_key }}
-        test_format: JUNIT
-        test_framework: JEST
-        test_path: ./junit.xml
-        coverage_format: JACOCO/XML
-        coverage_path: ./coverage
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version-file: '.node-version'
-        cache: 'npm'
-    - run: npm install
-    - run: npm run lint
+      - uses: actions/checkout@v4
+      - uses: vn7n24fzkq/github-profile-summary-cards@release
+        env: # default use ${{ secrets.SUMMARY_GITHUB_TOKEN }}, you should replace with your personal access token
+          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+        with:
+          USERNAME: ${{ github.aayushx402 }}
+          # BRANCH_NAME is optional, default to main, branch name to push cards
+          BRANCH_NAME: "main"
+          # UTC_OFFSET is optional, default to zero
+          UTC_OFFSET: 8
+          # EXCLUDE is an optional comma seperated list of languages to exclude, defaults to ""
+          EXCLUDE: ""
+          # AUTO_PUSH is optional, a boolean variable default to true, whether automatically push generated files to desired branch
+          AUTO_PUSH: true
