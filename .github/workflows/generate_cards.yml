@@ -1,0 +1,21 @@
+name: Generate Profile Summary Cards
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *' # Runs at midnight UTC every day
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Generate summary cards
+        uses: vn7n24fzkq/github-profile-summary-cards@release
+        with:
+          USERNAME: aayushx402
+          PAT: ${{ secrets.GITHUB_TOKEN }}
